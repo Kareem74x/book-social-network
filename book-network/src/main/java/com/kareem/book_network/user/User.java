@@ -62,7 +62,7 @@ public class User implements UserDetails, UserPrincipal {
 
     @Override
     public String getName() {
-        return email; //unique identifier of the app
+        return email;
     }
 
     @Override
@@ -80,7 +80,7 @@ public class User implements UserDetails, UserPrincipal {
 
     @Override
     public String getUsername() {
-        return email;
+        return email; //unique identifier of the user
     }
 
     @Override

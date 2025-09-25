@@ -1,4 +1,4 @@
-package security;
+package com.kareem.book_network.security;
 
 import com.kareem.book_network.security.JwtFilter;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class SecurityConfig {
 
     private JwtFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
-    
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
