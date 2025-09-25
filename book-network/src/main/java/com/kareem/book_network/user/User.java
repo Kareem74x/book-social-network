@@ -1,11 +1,13 @@
 package com.kareem.book_network.user;
 
+import com.kareem.book_network.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.nio.file.attribute.UserPrincipal;
@@ -13,6 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -41,7 +44,11 @@ public class User implements UserDetails, UserPrincipal {
     private boolean accountLocked;
     private boolean enabled;
 
-    // private List<Role> roles;
+
+    // Eager ==> Load relationship immediately with parent.
+    // LAZY  ==> Load relationship later, only when accessed.
+    @ManyToMany(fetch = FetchType.EAGER)
+    private List<Role> roles;
 
 
     @CreatedDate
@@ -60,7 +67,10 @@ public class User implements UserDetails, UserPrincipal {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return this.roles
+                .stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .collect(Collectors.toList());
     }
 
     @Override
