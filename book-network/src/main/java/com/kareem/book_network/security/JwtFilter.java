@@ -35,25 +35,25 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
+        
 
-
-
-
-
+        
+        
+        
         final String authorizationHeader = request.getHeader("Authorization");
-
+        
         if(authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-
-
-
-
+        
+        
+        
+        
         final String jwt = authorizationHeader.substring(7);
         final String userEmail = jwtService.extractUsername(jwt);
-
+        
         // not authenticated yet
         if(userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
@@ -69,10 +69,10 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         }
 
-
-
-
         
+        
+
+
         // call the rest of the filter chain
         filterChain.doFilter(request, response);
     }
