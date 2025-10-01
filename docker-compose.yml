@@ -18,8 +18,8 @@ services:
     container_name: mai-dev-bsn
     image: maildev/maildev
     ports:
-      - 1080:1080
-      - 1025:1025
+      - 1080:1080  #reading mail (Web UI output)
+      - 1025:1025  #sending mail (SMTP input)
 
 networks:
   spring-demo:

@@ -1,11 +1,15 @@
 package com.kareem.book_network.auth;
 
+import com.kareem.book_network.email.EmailService;
+import com.kareem.book_network.email.EmailTemplateName;
 import com.kareem.book_network.role.RoleRepository;
 import com.kareem.book_network.user.Token;
 import com.kareem.book_network.user.TokenRepository;
 import com.kareem.book_network.user.User;
 import com.kareem.book_network.user.UserRepository;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +25,13 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
+    private final EmailService emailService;
+
+    @Value("${application.mailing.frontend.activation-url}")
+    private String activationUrl;
 
 
-    public void register(RegistrationRequest request) {
+    public void register(RegistrationRequest request) throws MessagingException {
 
         var userRoles = roleRepository.findByName("USER")
                 // to do - better exception handling
@@ -81,11 +89,11 @@ public class AuthenticationService {
         return generatedToken;
     }
 
-    private void sendValidationEmail(User user) {
+    private void sendValidationEmail(User user) throws MessagingException {
 
         var newToken = generateAndSaveActivationToken(user);
-        
-        // send email
+
+        emailService.sendEmail(user.getEmail(), user.getFullName(), EmailTemplateName.ACTIVATE_ACCOUNT, activationUrl, newToken, "Account Activation");
     }
 
 }

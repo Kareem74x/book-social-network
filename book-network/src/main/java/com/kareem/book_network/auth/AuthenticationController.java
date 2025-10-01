@@ -1,6 +1,7 @@
 package com.kareem.book_network.auth;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,11 +19,10 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.ACCEPTED) // This tells Spring what HTTP status code to return for the response.
-    public ResponseEntity<?> registerUser(@RequestBody @Valid RegistrationRequest request) {
+    public ResponseEntity<?> registerUser(@RequestBody @Valid RegistrationRequest request) throws MessagingException {
 
         authService.register(request);
         return ResponseEntity.accepted().build();
-
     }
 
 }
