@@ -1,5 +1,7 @@
 package com.kareem.book_network.user;
 
+import com.kareem.book_network.book.Book;
+import com.kareem.book_network.history.BookTransactionHistory;
 import com.kareem.book_network.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -45,10 +47,18 @@ public class User implements UserDetails, UserPrincipal {
     private boolean enabled;
 
 
+
     // Eager ==> Load relationship immediately with parent.
     // LAZY  ==> Load relationship later, only when accessed.
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
+
+    @OneToMany(mappedBy = "owner")
+    private List<Book> books;
+
+    @OneToMany(mappedBy = "user")
+    private List<BookTransactionHistory> transactions;
+
 
 
     @CreatedDate
