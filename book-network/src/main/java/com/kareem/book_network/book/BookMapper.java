@@ -2,6 +2,8 @@ package com.kareem.book_network.book;
 
 import org.springframework.stereotype.Service;
 
+import java.util.function.Function;
+
 @Service
 public class BookMapper {
 
@@ -14,6 +16,22 @@ public class BookMapper {
                 .synopsis(request.synopsis())
                 .archived(false)
                 .shareable(request.shareable())
+                .build();
+    }
+
+
+    public BookResponse toBookResponse(Book book) {
+        return BookResponse.builder()
+                .id(book.getId())
+                .title(book.getTitle())
+                .authorName(book.getAuthorName())
+                .isbn(book.getIsbn())
+                .synopsis(book.getSynopsis())
+                .rate(book.getRate())
+                .archived(book.isArchived())
+                .shareable(book.isShareable())
+                .Owner(book.getOwner().getFullName())
+                // .cover
                 .build();
     }
 }
