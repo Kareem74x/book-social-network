@@ -1,6 +1,8 @@
 package com.kareem.book_network.book;
 
 import com.kareem.book_network.common.PageResponse;
+import com.kareem.book_network.history.BookTransactionHistory;
+import com.kareem.book_network.history.BookTransactionHistoryRepository;
 import com.kareem.book_network.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ public class BookService {
 
     private final BookMapper bookMapper;
     private final BookRepository bookRepository;
+    private final BookTransactionHistoryRepository bookTransactionHistoryRepository;
 
 
     public Integer save(BookRequest request, Authentication connectedUser) {
@@ -87,5 +90,28 @@ public class BookService {
                 books.isFirst(),
                 books.isLast()
         );
+    }
+
+    public PageResponse<BorrowedBookResponse> findAllBorrowedBooks(int pageNumber, int size, Authentication connectedUser) {
+
+        User user = ((User) connectedUser.getPrincipal());
+
+        Pageable pageable = PageRequest.of(pageNumber, size, Sort.by("createdDate").descending());
+
+        Page<BookTransactionHistory> borrowedBooks = bookTransactionHistoryRepository.findAllBorrowedBooks(pageable, user.getId());
+
+        List<BorrowedBookResponse> borrowedBookResponses = borrowedBooks.stream()
+                .map(bookMapper::toBorrowedBookResponse)
+                .toList();
+
+        return new PageResponse<>(
+                borrowedBookResponses,
+                borrowedBooks.getNumber(),
+                borrowedBooks.getSize(),
+                borrowedBooks.getTotalElements(),
+                borrowedBooks.getTotalPages(),
+                borrowedBooks.isFirst(),
+                borrowedBooks.isLast()
+        )
     }
 }
