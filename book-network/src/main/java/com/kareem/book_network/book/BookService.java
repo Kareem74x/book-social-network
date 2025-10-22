@@ -1,6 +1,7 @@
 package com.kareem.book_network.book;
 
 import com.kareem.book_network.common.PageResponse;
+import com.kareem.book_network.exception.OperationNotPermittedException;
 import com.kareem.book_network.history.BookTransactionHistory;
 import com.kareem.book_network.history.BookTransactionHistoryRepository;
 import com.kareem.book_network.user.User;
@@ -14,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -136,5 +138,23 @@ public class BookService {
                 borrowedBooks.isFirst(),
                 borrowedBooks.isLast()
         );
+    }
+
+    public Integer updateShareableStatus(Integer bookId, Authentication connectedUser) {
+
+        User user = ((User) connectedUser.getPrincipal());
+
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("No book with id: " + bookId));
+
+        // only the owner can update the book
+        if(!Objects.equals(book.getOwner().getId(), user.getId())) {
+            throw new OperationNotPermittedException("You cannot update book status if you aren't the owner");
+        }
+
+        book.setShareable(!book.isShareable());
+        bookRepository.save(book);
+
+        return bookId;
     }
 }
