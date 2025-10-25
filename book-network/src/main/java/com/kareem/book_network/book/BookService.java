@@ -2,9 +2,11 @@ package com.kareem.book_network.book;
 
 import com.kareem.book_network.common.PageResponse;
 import com.kareem.book_network.exception.OperationNotPermittedException;
+import com.kareem.book_network.file.FileStorageService;
 import com.kareem.book_network.history.BookTransactionHistory;
 import com.kareem.book_network.history.BookTransactionHistoryRepository;
 import com.kareem.book_network.user.User;
+import jakarta.mail.Multipart;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -13,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Objects;
@@ -24,7 +27,7 @@ public class BookService {
     private final BookMapper bookMapper;
     private final BookRepository bookRepository;
     private final BookTransactionHistoryRepository bookTransactionHistoryRepository;
-
+    private final FileStorageService fileStorageService;
 
     public Integer save(BookRequest request, Authentication connectedUser) {
 
@@ -231,7 +234,7 @@ public class BookService {
         return Transaction.getId();
     }
 
-    public Integer approveReturnBorrowedBook(Integer bookId, Authentication connectedUser) {
+    public Integer approveReturnOfBorrowedBook(Integer bookId, Authentication connectedUser) {
 
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new EntityNotFoundException("No book with id: " + bookId));
@@ -252,5 +255,17 @@ public class BookService {
         bookTransactionHistory.setReturnApproved(true);
         BookTransactionHistory Transaction = bookTransactionHistoryRepository.save(bookTransactionHistory);
         return Transaction.getId();
+    }
+
+    public void uploadBookCoverPicture(MultipartFile file, Authentication connectedUser, Integer bookId) {
+
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("No book with id: " + bookId));
+
+        User user = ((User) connectedUser.getPrincipal());
+
+        var bookCover = fileStorageService.saveFile(file, user.getId());
+        book.setBookCover(bookCover);
+        bookRepository.save(book);
     }
 }

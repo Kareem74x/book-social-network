@@ -1,12 +1,15 @@
 package com.kareem.book_network.book;
 
 import com.kareem.book_network.common.PageResponse;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.Multipart;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("books")
@@ -26,6 +29,14 @@ public class BookController {
         return ResponseEntity.ok(bookService.borrowBook(bookId, connectedUser));
     }
 
+    // consumes => means the request must contain a file upload
+    // MultipartFile is an interface that represents an uploaded file received in a multipart HTTP request.
+    // ? = wildcard type, It gives you flexibility and works well when returning generic or empty responses.
+    @PostMapping(value = "/cover/{book-id}", consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadBookCoverPicture(@PathVariable("book-id") Integer bookId, @Parameter() @RequestPart("file") MultipartFile file, Authentication connectedUser) {
+        bookService.uploadBookCoverPicture(file, connectedUser, bookId);
+        return ResponseEntity.accepted().build();
+    }
 
 
     @GetMapping("{book-id}")
@@ -91,7 +102,7 @@ public class BookController {
     }
 
     @PatchMapping("borrow/return/approve/{book-id}")
-    public ResponseEntity<Integer> approveReturnBorrowedBook(@PathVariable("book-id") Integer bookId, Authentication connectedUser) {
-        return ResponseEntity.ok(bookService.approveReturnBorrowedBook(bookId, connectedUser));
+    public ResponseEntity<Integer> approveReturnOfBorrowedBook(@PathVariable("book-id") Integer bookId, Authentication connectedUser) {
+        return ResponseEntity.ok(bookService.approveReturnOfBorrowedBook(bookId, connectedUser));
     }
 }
