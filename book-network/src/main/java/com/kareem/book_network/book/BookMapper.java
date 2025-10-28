@@ -34,7 +34,7 @@ public class BookMapper {
                 .shareable(book.isShareable())
                 .Owner(book.getOwner().getFullName())
                 .cover(FileUtils.readFileFromLocation(book.getBookCover()))
-                .build(); 
+                .build();
     }
 
 
