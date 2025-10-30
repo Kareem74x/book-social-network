@@ -4,8 +4,13 @@ spring:
   servlet:
     multipart:
       max-file-size: 50MB
+
 springdoc:
   default-produces-media-type: application/json
+  swagger-ui:
+    csrf:
+      enabled: true
+
 server:
   servlet:
     context-path: /api/v1/
